@@ -6,7 +6,7 @@ const app = express();
 // Sử dụng middleware CORS
 app.use(cors())
 
-app.listen(process.env.ACCESS_SECRET, () => {
+app.listen(process.env.PORT, () => {
     console.log('Server is running on port 3001');
 });
 
