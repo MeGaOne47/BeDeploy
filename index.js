@@ -1,9 +1,14 @@
 require("dotenv").config();
-
+const cors = require('cors');
 const express = require('express');
 const app = express();
 
-app.listen(3001);
+// Sử dụng middleware CORS
+app.use(cors())
+
+app.listen(3001, () => {
+    console.log('Server is running on port 3001');
+});
 
 const aws = require('aws-sdk');
 const multer = require('multer');
