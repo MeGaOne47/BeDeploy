@@ -65,6 +65,7 @@ app.get("/download/:folder/:filename", async (req, res) => {
 
     try {
         let x = await s3.getObject({ Bucket: BUCKET_NAME, Key: key }).promise();
+        res.set('Content-Type', 'image/png');
         res.send(x.Body);
     } catch (error) {
         console.error(error);
