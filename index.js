@@ -57,6 +57,21 @@ app.get("/download/:filename", async (req, res) => {
     }
 });
 
+app.get("/download/:folder/:filename", async (req, res) => {
+    const folder = req.params.folder;
+    const filename = req.params.filename;
+    const key = folder + '/' + filename; // Tạo key cho tên file trong thư mục
+    const downloadUrl = `https://hung1.s3.ap-southeast-2.amazonaws.com/${key}`; // Đường dẫn của hình ảnh trên S3 bucket
+
+    try {
+        let x = await s3.getObject({ Bucket: BUCKET_NAME, Key: key }).promise();
+        res.send(x.Body);
+    } catch (error) {
+        console.error(error);
+        res.status(404).send("File Not Found");
+    }
+});
+
 app.delete("/delete/:folder/:filename", async (req, res) => {
     const folder = req.params.folder;
     const filename = req.params.filename;
