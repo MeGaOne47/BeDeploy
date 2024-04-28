@@ -57,6 +57,21 @@ app.get("/download/:filename", async (req, res) => {
     }
 });
 
+app.delete("/delete/:folder/:filename", async (req, res) => {
+    const folder = req.params.folder;
+    const filename = req.params.filename;
+    const key = folder + '/' + filename; // Tạo key cho tên file trong thư mục
+
+    try {
+        await s3.deleteObject({ Bucket: BUCKET_NAME, Key: key }).promise();
+        res.send("File Deleted Successfully");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 app.delete("/delete/:filename", async (req, res) => {
     const filename = req.params.filename;
     try {
