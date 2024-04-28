@@ -1,28 +1,22 @@
-require("dotenv").config();
-const cors = require('cors');
 const express = require('express');
 const app = express();
-
-// Sử dụng middleware CORS
-app.use(cors())
-
-app.listen(process.env.PORT, () => {
-    console.log('Server is running on port 3001');
-});
-
+const cors = require('cors');
+const dotenv = require('dotenv');
 const aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 
-aws.config.update({
+dotenv.config();
+
+// Sử dụng middleware CORS
+app.use(cors());
+
+const BUCKET_NAME = process.env.BUCKET_NAME;
+const s3 = new aws.S3({
     secretAccessKey: process.env.ACCESS_SECRET,
     accessKeyId: process.env.ACCESS_KEY,
     region: process.env.REGION,
-    // Note: 'bucket' is not a valid AWS SDK configuration property
 });
-
-const BUCKET_NAME = process.env.BUCKET_NAME;
-const s3 = new aws.S3();
 
 const upload = multer({
     storage: multerS3({
@@ -30,11 +24,10 @@ const upload = multer({
         bucket: BUCKET_NAME,
         metadata: function (req, file, cb) {
             cb(null, {fieldName: file.fieldname});
-          },
-          key: function (req, file, cb) {
-            // cb(null, Date.now().toString())
-            cb(null, file.originalname)
-          }
+        },
+        key: function (req, file, cb) {
+            cb(null, file.originalname);
+        }
     })
 });
 
@@ -73,4 +66,9 @@ app.delete("/delete/:filename", async (req, res) => {
         console.error(error);
         res.status(500).send("Internal Server Error");
     }
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
