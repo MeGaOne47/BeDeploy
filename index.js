@@ -31,6 +31,23 @@ const upload = multer({
     })
 });
 
+app.get("/view/:filename", async (req, res) => {
+    const filename = req.params.filename;
+    const key = filename; // Tên file trong bucket
+
+    try {
+        // Lấy hình ảnh từ S3
+        let x = await s3.getObject({ Bucket: BUCKET_NAME, Key: key }).promise();
+        
+        // Gửi hình ảnh trực tiếp
+        res.set('Content-Type', 'image/png'); // Thay đổi loại nội dung nếu cần
+        res.send(x.Body);
+    } catch (error) {
+        console.error(error);
+        res.status(404).send("File Not Found");
+    }
+});
+
 app.post('/upload', upload.single('file'), async function (req, res, next) {
     res.send('Successfully uploaded ' + req.file.location + ' location!');
 });
