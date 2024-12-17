@@ -36,17 +36,28 @@ app.get("/view/:filename", async (req, res) => {
     const key = filename; // Tên file trong bucket
 
     try {
-        // Lấy hình ảnh từ S3
-        let x = await s3.getObject({ Bucket: BUCKET_NAME, Key: key }).promise();
-        
-        // Gửi hình ảnh trực tiếp
-        res.set('Content-Type', 'image/png'); // Thay đổi loại nội dung nếu cần
-        res.send(x.Body);
+        // Lấy file từ S3
+        const data = await s3.getObject({ Bucket: BUCKET_NAME, Key: key }).promise();
+
+        // Xác định Content-Type dựa trên loại file
+        let contentType;
+        if (filename.endsWith('.png')) {
+            contentType = 'image/png';
+        } else if (filename.endsWith('.pdf')) {
+            contentType = 'application/pdf';
+        } else {
+            contentType = 'application/octet-stream'; // Loại file không xác định
+        }
+
+        // Gửi file trực tiếp với đúng Content-Type
+        res.set('Content-Type', contentType);
+        res.send(data.Body);
     } catch (error) {
         console.error(error);
         res.status(404).send("File Not Found");
     }
 });
+
 
 app.post('/upload', upload.single('file'), async function (req, res, next) {
     res.send('Successfully uploaded ' + req.file.location + ' location!');
